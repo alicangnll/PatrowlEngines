@@ -51,15 +51,32 @@ stages:
   after_script:
     - docker images | grep $STACK
     - docker stop $(docker ps -a -q --filter ancestor=$REGISTRY_URL/$STACK:$VERSION)
-   
+
+sonarqube-check:
+  image: 
+    name: sonarsource/sonar-scanner-cli:latest
+    entrypoint: [""]
+  variables:
+    SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"  # Defines the location of the analysis task cache
+    GIT_DEPTH: "0"  # Tells git to fetch all the branches of the project, required by the analysis task
+  cache:
+    key: "${CI_JOB_NAME}"
+    paths:
+      - .sonar/cache
+  script: 
+    - sonar-scanner
+  allow_failure: true
+  only:
+    - develop
+
 include:
   - local: '/engines/apivoid/.apivoid.gitlab-ci.yml'
-  - local: '/engines/arachni/.arachni.gitlab-ci.yml'
+#   - local: '/engines/arachni/.arachni.gitlab-ci.yml'
 #   - local: '/engines/burp/.burp.gitlab-ci.yml'
 #   - local: '/engines/censys/.censys.gitlab-ci.yml'
-  - local: '/engines/certstream/.certstream.gitlab-ci.yml'
-  - local: '/engines/cortex/.cortex.gitlab-ci.yml'
-  - local: '/engines/cybelangel/.cybelangel.gitlab-ci.yml'
+#   - local: '/engines/certstream/.certstream.gitlab-ci.yml'
+#   - local: '/engines/cortex/.cortex.gitlab-ci.yml'
+#   - local: '/engines/cybelangel/.cybelangel.gitlab-ci.yml'
   - local: '/engines/droopescan/.droopescan.gitlab-ci.yml'
   - local: '/engines/eyewitness/.eyewitness.gitlab-ci.yml'
   - local: '/engines/nessus/.nessus.gitlab-ci.yml'
@@ -68,11 +85,11 @@ include:
   - local: '/engines/owl_code/.owl_code.gitlab-ci.yml'
   - local: '/engines/owl_dns/.owl_dns.gitlab-ci.yml'
   - local: '/engines/owl_leaks/.owl_leaks.gitlab-ci.yml'
-  - local: '/engines/owl_request/.owl_request.gitlab-ci.yml'
-  - local: '/engines/pastebin_monitor/.pastebin_monitor.gitlab-ci.yml'
-  - local: '/engines/shhgit/.shhgit.gitlab-ci.yml'
+#   - local: '/engines/owl_request/.owl_request.gitlab-ci.yml'
+#   - local: '/engines/pastebin_monitor/.pastebin_monitor.gitlab-ci.yml'
+#   - local: '/engines/shhgit/.shhgit.gitlab-ci.yml'
   - local: '/engines/sslscan/.sslscan.gitlab-ci.yml'
   - local: '/engines/ssllabs/.ssllabs.gitlab-ci.yml'
-  - local: '/engines/urlvoid/.urlvoid.gitlab-ci.yml'
-  - local: '/engines/virustotal/.virustotal.gitlab-ci.yml'
+#   - local: '/engines/urlvoid/.urlvoid.gitlab-ci.yml'
+#   - local: '/engines/virustotal/.virustotal.gitlab-ci.yml'
   - local: '/engines/wpscan/.wpscan.gitlab-ci.yml'
